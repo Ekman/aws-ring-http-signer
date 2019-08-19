@@ -6,18 +6,13 @@ php:
   - 7.3
   - 7.4snapshot
   - nightly
-  - hhvm
   
 matrix:
   allow_failures:
   - php: 7.4snapshot
-    env: COMPOSER_FLAGS="--ignore-platform-reqs"
   - php: nightly
-    env: COMPOSER_FLAGS="--ignore-platform-reqs"
-  - php: hhvm
-    env: COMPOSER_FLAGS="--ignore-platform-reqs"
 
-install: composer install --no-interaction --classmap-authoritative --no-suggest ${COMPOSER_FLAGS}
+install: composer install --no-interaction --classmap-authoritative --no-suggest --ignore-platform-reqs
 
 script: vendor/bin/phpunit --configuration phpunit.xml
 
