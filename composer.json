@@ -47,6 +47,6 @@
         }
     },
     "suggest": {
-        "elasticsearch/elasticsearch": "Sign all Elasticsearch requests using AWS credentials"
+        "elasticsearch/elasticsearch": "Sign Elasticsearch requests using AWS credentials"
     }
 }

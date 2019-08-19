@@ -74,9 +74,15 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
      */
     public function convertRingToPsr(array $request): RequestInterface
     {
+        $url = PsrRequestUtility::getUrl($request);
+        
+        if (empty($url)) {
+            throw new \InvalidArgumentException("Could not find a URL in the request");    
+        }
+        
         return new Request(
             $request["http_method"],
-            PsrRequestUtility::getUrl($request),
+            $url,
             $request["headers"],
             $request["body"] ?? null
         );
@@ -89,12 +95,20 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
      * @return array A Ring request from the PSR-7 request
      */
     public function convertPsrToRing(RequestInterface $request): array
-    {
+    {        
+        if (! $request->hasHeader("Host")) {
+            $request = $request->withHeader("Host", $request->getUri()->getHost());
+        }
+        
+        $body = $request->getBody();
+        $contentLength = $body->getSize();
+        
         return [
             "http_method" => $request->getMethod(),
             "uri" => "/{$request->getUri()->getPath()}",
             "headers" => $request->getHeaders(),
-            "body" => $request->getBody()
+            "body" => ! empty($contentLength) ? $body : null,
+            "scheme" => $request->getUri()->getScheme()
         ];
     }
 }

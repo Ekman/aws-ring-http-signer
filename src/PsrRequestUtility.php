@@ -54,11 +54,9 @@ class PsrRequestUtility
             return null;
         }
         
-        if (! isset($ringRequest["scheme"]) || empty($ringRequest["scheme"])) {
-            return null;
-        }
+        $scheme = $ringRequest["scheme"] ?? "http";
         
-        return "{$ringRequest['scheme']}://{$host}{$ringRequest['uri']}";
+        return "{$scheme}://{$host}{$ringRequest['uri']}";
     }
     
     /**
