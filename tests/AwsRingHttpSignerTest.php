@@ -7,6 +7,8 @@ use Aws\Signature\SignatureV4;
 use GuzzleHttp\Ring\Client\MockHandler;
 use Nekman\AwsRingHttpSigner\AwsRingHttpSigner;
 use PHPUnit\Framework\TestCase;
+use Nekman\AwsRingHttpSigner\AwsRingHttpSignerFactory;
+use GuzzleHttp\Psr7\Request;
 
 class AwsRingHttpSignerTest extends TestCase
 {
@@ -42,5 +44,47 @@ class AwsRingHttpSignerTest extends TestCase
         $response = $awsRingHttpSigner($assertHandler($handler))($request);
         
         $this->assertEquals(200, $response["status"]);
+    }
+    
+    /** @dataProvider provideConvertRingToPsr */
+    public function testConvertRingToPsr($request, $expected)
+    {
+        $this->assertEquals($expected, AwsRingHttpSignerFactory::create("eu-central-1")->convertRingToPsr($request));
+    }
+    
+    public function provideConvertRingToPsr()
+    {
+        return [
+            [
+                [
+                    "http_method" => "GET",
+                    "headers" => ["Host" => ["google.com"]],
+                    "uri" => "/"
+                ],
+                new Request("GET", "http://google.com/")
+            ]
+        ];
+    }
+    
+    /** @dataProvider provideConvertPsrToRing */
+    public function testConvertPsrToRing($request, $expected)
+    {
+        $this->assertEquals($expected, AwsRingHttpSignerFactory::create("eu-central-1")->convertPsrToRing($request));
+    }
+    
+    public function provideConvertPsrToRing()
+    {
+        return [
+            [
+                new Request("GET", "https://google.com"),
+                [
+                    "http_method" => "GET",
+                    "headers" => ["Host" => ["google.com"]],
+                    "uri" => "/",
+                    "body" => null,
+                    "scheme" => "https"
+                ]
+            ]
+        ];
     }
 }

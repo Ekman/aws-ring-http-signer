@@ -23,12 +23,12 @@ class PsrRequestUtilityTest extends TestCase
                 ],
                 "https://example.com/path"
             ],
-            "Test without scheme" => [
+            "Test without scheme (defaults to http)" => [
                 [
                     "headers" => ["host" => ["example.com"]],
                     "uri" => "/path"
                 ],
-                null
+                "http://example.com/path"
             ],
             "Test without host" => [
                 [
