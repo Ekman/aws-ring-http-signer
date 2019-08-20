@@ -95,7 +95,8 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
      */
     public function convertPsrToRing(RequestInterface $request): array
     {
-        $path = $request->getUri()->getPath();
+        // Remove all trailing slash
+        $path = ltrim($request->getUri()->getPath(), "/");
         
         if (! $request->hasHeader("Host") && ! $request->hasHeader("host")) {
             $host = $request->getUri()->getHost();
