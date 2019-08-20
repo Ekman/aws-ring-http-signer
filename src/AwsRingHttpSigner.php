@@ -29,7 +29,6 @@ namespace Nekman\AwsRingHttpSigner;
 
 use Aws\Signature\SignatureInterface;
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Ring\Future\FutureArray;
 use GuzzleHttp\Ring\Future\FutureArrayInterface;
 use Nekman\AwsRingHttpSigner\Contract\AwsRingHttpSignerInterface;
 use Psr\Http\Message\RequestInterface;
@@ -60,9 +59,7 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
             
             // Convert the request back to Ring HTTP and continue
             $request = $this->convertPsrToRing($signedPsrRequest);
-            $promise = $handler($request);
-            
-            return new FutureArray($promise);
+            return $handler($request);
         };
     }
     
@@ -77,7 +74,7 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
         $url = PsrRequestUtility::getUrl($request);
         
         if (empty($url)) {
-            throw new \InvalidArgumentException("Could not find a URL in the request");    
+            throw new \InvalidArgumentException("Could not find a URL in the request");
         }
         
         return new Request(
@@ -95,7 +92,7 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
      * @return array A Ring request from the PSR-7 request
      */
     public function convertPsrToRing(RequestInterface $request): array
-    {        
+    {
         if (! $request->hasHeader("Host")) {
             $request = $request->withHeader("Host", $request->getUri()->getHost());
         }
