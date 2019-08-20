@@ -104,8 +104,8 @@ class AwsRingHttpSignerTest extends TestCase
         $this->assertEquals($expected["http_method"], $ringRequest["http_method"]);
         $this->assertEquals($expected["headers"], $ringRequest["headers"]);
         $this->assertEquals($expected["uri"], $ringRequest["uri"]);
-        $this->assertInstanceOf(StreamInterface::class, $ringRequest["body"]);
-        $this->assertEquals($expected["body"], $ringRequest["body"]->getContents());
+        $this->assertNotInstanceOf(StreamInterface::class, $ringRequest["body"]);
+        $this->assertEquals($expected["body"], $ringRequest["body"]);
         $this->assertEquals($expected["scheme"], $ringRequest["scheme"]);
         $this->assertEquals($expected["query_string"] ?? null, $ringRequest["query_string"]);
         $this->assertEquals($expected["version"] ?? "1.1", $ringRequest["version"] ?? "1.1");
@@ -144,6 +144,17 @@ class AwsRingHttpSignerTest extends TestCase
                     "body" => null,
                     "scheme" => "https",
                     "query_string" => "foo=bar"
+                ]
+            ],
+            "Test without scheme" => [
+                new Request("GET", "service.local"),
+                [
+                    "http_method" => "GET",
+                    "headers" => ["Host" => ["service.local"]],
+                    "uri" => "/",
+                    "body" => null,
+                    "scheme" => "http",
+                    "query_string" => null
                 ]
             ]
         ];

@@ -95,18 +95,30 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
      */
     public function convertPsrToRing(RequestInterface $request): array
     {
-        if (! $request->hasHeader("Host")) {
-            $request = $request->withHeader("Host", $request->getUri()->getHost());
+        $path = $request->getUri()->getPath();
+        
+        if (! $request->hasHeader("Host") && ! $request->hasHeader("host")) {
+            $host = $request->getUri()->getHost();
+            
+            // There's a bug in parse_url where an address without
+            // scheme is parsed as "path" and not "host"
+            if (empty($host)) {
+                $host = $request->getUri()->getPath();
+                $path = null;
+            }
+            
+            $request = $request->withHeader("Host", $host);
         }
         
         $body = $request->getBody()->getContents();
+        $scheme = $request->getUri()->getScheme();
         
         return [
             "http_method" => $request->getMethod(),
-            "uri" => "/{$request->getUri()->getPath()}",
+            "uri" => "/{$path}",
             "headers" => $request->getHeaders(),
             "body" => empty($body) ? null : $body,
-            "scheme" => $request->getUri()->getScheme(),
+            "scheme" => ! empty($scheme) ? $scheme : "http",
             "query_string" => $request->getUri()->getQuery(),
             "version" => $request->getProtocolVersion() ?? "1.1"
         ];
