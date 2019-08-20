@@ -99,11 +99,13 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
             $request = $request->withHeader("Host", $request->getUri()->getHost());
         }
         
+        $body = $request->getBody()->getContents();
+        
         return [
             "http_method" => $request->getMethod(),
             "uri" => "/{$request->getUri()->getPath()}",
             "headers" => $request->getHeaders(),
-            "body" => $request->getBody(),
+            "body" => empty($body) ? null : $body,
             "scheme" => $request->getUri()->getScheme(),
             "query_string" => $request->getUri()->getQuery(),
             "version" => $request->getProtocolVersion() ?? "1.1"
