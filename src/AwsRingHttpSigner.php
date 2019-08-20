@@ -34,7 +34,7 @@ use Nekman\AwsRingHttpSigner\Contract\AwsRingHttpSignerInterface;
 use Psr\Http\Message\RequestInterface;
 
 class AwsRingHttpSigner implements AwsRingHttpSignerInterface
-{
+{    
     /** @var SignatureInterface */
     private $signature;
     
@@ -49,17 +49,18 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
     
     public function __invoke(callable $handler): callable
     {
-        return function (array $request) use ($handler) : FutureArrayInterface {
+        return function (array $ringRequest) use ($handler) : FutureArrayInterface {
             // Fetch the AWS credentials
             $credentials = call_user_func($this->credentialsProvider)->wait();
             
             // Sign the request using the AWS credentials
-            $psrRequest = $this->convertRingToPsr($request);
+            $psrRequest = $this->convertRingToPsr($ringRequest);
             $signedPsrRequest = $this->signature->signRequest($psrRequest, $credentials);
             
-            // Convert the request back to Ring HTTP and continue
-            $request = $this->convertPsrToRing($signedPsrRequest);
-            return $handler($request);
+            // Convert the request back to Ring HTTP and continue. Merge the new request with the old
+            // so we do not loose any keys
+            $signedRingRequest = array_merge($ringRequest, $this->convertPsrToRing($signedPsrRequest));
+            return $handler($signedRingRequest);
         };
     }
     
@@ -80,8 +81,9 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
         return new Request(
             $request["http_method"],
             $url,
-            $request["headers"],
-            $request["body"] ?? null
+            $request["headers"] ?? [],
+            $request["body"] ?? null,
+            $request["version"] ?? "1.1"
         );
     }
     
@@ -93,19 +95,35 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
      */
     public function convertPsrToRing(RequestInterface $request): array
     {
-        if (! $request->hasHeader("Host")) {
-            $request = $request->withHeader("Host", $request->getUri()->getHost());
+        // Remove all trailing slash
+        $path = ltrim($request->getUri()->getPath(), "/");
+        
+        if (! $request->hasHeader("Host") && ! $request->hasHeader("host")) {
+            $host = $request->getUri()->getHost();
+            
+            // There's a bug in parse_url where an address without
+            // scheme is parsed as "path" and not "host"
+            if (empty($host)) {
+                $host = $request->getUri()->getPath();
+                $path = null;
+            }
+            
+            $request = $request->withHeader("Host", $host);
         }
         
-        $body = $request->getBody();
-        $contentLength = $body->getSize();
+        // The Elasticsearch PHP client seems to not like passing a StreamInterface as body,
+        // even though it adheres to the Ring HTTP specification.
+        $body = $request->getBody()->getContents();
+        $scheme = $request->getUri()->getScheme();
         
         return [
             "http_method" => $request->getMethod(),
-            "uri" => "/{$request->getUri()->getPath()}",
+            "uri" => "/{$path}",
             "headers" => $request->getHeaders(),
-            "body" => ! empty($contentLength) ? $body : null,
-            "scheme" => $request->getUri()->getScheme()
+            "body" => empty($body) ? null : $body,
+            "scheme" => ! empty($scheme) ? $scheme : "http",
+            "query_string" => $request->getUri()->getQuery(),
+            "version" => $request->getProtocolVersion() ?? "1.1"
         ];
     }
 }

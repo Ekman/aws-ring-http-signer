@@ -9,6 +9,7 @@ use GuzzleHttp\Ring\Client\MockHandler;
 use Nekman\AwsRingHttpSigner\AwsRingHttpSigner;
 use Nekman\AwsRingHttpSigner\AwsRingHttpSignerFactory;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\StreamInterface;
 
 class AwsRingHttpSignerTest extends TestCase
 {
@@ -27,7 +28,8 @@ class AwsRingHttpSignerTest extends TestCase
             "http_method" => "GET",
             "headers" => ["Host" => "example.com"],
             "scheme" => "https",
-            "uri" => "/"
+            "uri" => "/",
+            "future" => true
         ];
         
         $handler = new MockHandler(["status" => 200]);
@@ -36,6 +38,8 @@ class AwsRingHttpSignerTest extends TestCase
             return function (array $request) use ($handler, $expectedAwsSignatureRegexp) {
                 // Assert that the request has been signed properly
                 $this->assertRegExp($expectedAwsSignatureRegexp, $request["headers"]["Authorization"][0]);
+                // Assert that merging keys works
+                $this->assertTrue($request["future"]);
                 
                 return $handler($request);
             };
@@ -47,9 +51,16 @@ class AwsRingHttpSignerTest extends TestCase
     }
     
     /** @dataProvider provideConvertRingToPsr */
-    public function testConvertRingToPsr($request, $expected)
+    public function testConvertRingToPsr($ringRequest, $expected)
     {
-        $this->assertEquals($expected, AwsRingHttpSignerFactory::create("eu-central-1")->convertRingToPsr($request));
+        /** @var \Psr\Http\Message\RequestInterface $psrRequest */
+        $psrRequest = AwsRingHttpSignerFactory::create("eu-central-1")->convertRingToPsr($ringRequest);
+        
+        $this->assertEquals($expected->getMethod(), $psrRequest->getMethod());
+        $this->assertEquals($expected->getHeaders(), $psrRequest->getHeaders());
+        $this->assertEquals($expected->getUri(), $psrRequest->getUri());
+        $this->assertEquals($expected->getBody()->getContents(), $psrRequest->getBody()->getContents());
+        $this->assertEquals($expected->getProtocolVersion(), $psrRequest->getProtocolVersion());
     }
     
     public function provideConvertRingToPsr()
@@ -59,17 +70,45 @@ class AwsRingHttpSignerTest extends TestCase
                 [
                     "http_method" => "GET",
                     "headers" => ["Host" => ["google.com"]],
-                    "uri" => "/"
+                    "uri" => "/",
+                    "version" => 1.1
                 ],
-                new Request("GET", "http://google.com/")
+                new Request("GET", "http://google.com/", ["Host" => ["google.com"]])
+            ],
+            "Test with body" => [
+                [
+                    "http_method" => "PUT",
+                    "headers" => ["Host" => ["google.com"]],
+                    "uri" => "/",
+                    "body" => '{"hello":"world"}'
+                ],
+                new Request("PUT", "http://google.com/", ["Host" => ["google.com"]], '{"hello":"world"}')
+            ],
+            "Test with query string" => [
+                [
+                    "http_method" => "GET",
+                    "headers" => ["Host" => ["google.com"]],
+                    "uri" => "/",
+                    "query_string" => "foo=bar"
+                ],
+                new Request("GET", "http://google.com/?foo=bar", ["Host" => ["google.com"]])
             ]
         ];
     }
     
     /** @dataProvider provideConvertPsrToRing */
-    public function testConvertPsrToRing($request, $expected)
+    public function testConvertPsrToRing($psrRequest, $expected)
     {
-        $this->assertEquals($expected, AwsRingHttpSignerFactory::create("eu-central-1")->convertPsrToRing($request));
+        $ringRequest = AwsRingHttpSignerFactory::create("eu-central-1")->convertPsrToRing($psrRequest);
+        
+        $this->assertEquals($expected["http_method"], $ringRequest["http_method"]);
+        $this->assertEquals($expected["headers"], $ringRequest["headers"]);
+        $this->assertEquals($expected["uri"], $ringRequest["uri"]);
+        $this->assertNotInstanceOf(StreamInterface::class, $ringRequest["body"]);
+        $this->assertEquals($expected["body"], $ringRequest["body"]);
+        $this->assertEquals($expected["scheme"], $ringRequest["scheme"]);
+        $this->assertEquals($expected["query_string"] ?? null, $ringRequest["query_string"]);
+        $this->assertEquals($expected["version"] ?? "1.1", $ringRequest["version"] ?? "1.1");
     }
     
     public function provideConvertPsrToRing()
@@ -82,7 +121,40 @@ class AwsRingHttpSignerTest extends TestCase
                     "headers" => ["Host" => ["google.com"]],
                     "uri" => "/",
                     "body" => null,
+                    "scheme" => "https",
+                    "version" => "1.1"
+                ]
+            ],
+            "Test with body" => [
+                new Request("PUT", "https://google.com", [], '{"hello":"world"}'),
+                [
+                    "http_method" => "PUT",
+                    "headers" => ["Host" => ["google.com"]],
+                    "uri" => "/",
+                    "body" => '{"hello":"world"}',
                     "scheme" => "https"
+                ]
+            ],
+            "Test with query string" => [
+                new Request("GET", "https://google.com?foo=bar"),
+                [
+                    "http_method" => "GET",
+                    "headers" => ["Host" => ["google.com"]],
+                    "uri" => "/",
+                    "body" => null,
+                    "scheme" => "https",
+                    "query_string" => "foo=bar"
+                ]
+            ],
+            "Test without scheme" => [
+                new Request("GET", "service.local"),
+                [
+                    "http_method" => "GET",
+                    "headers" => ["Host" => ["service.local"]],
+                    "uri" => "/",
+                    "body" => null,
+                    "scheme" => "http",
+                    "query_string" => null
                 ]
             ]
         ];
