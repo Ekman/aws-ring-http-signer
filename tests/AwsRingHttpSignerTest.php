@@ -4,11 +4,11 @@ namespace Nekman\AwsRingHttpSigner\Test;
 use Aws\Credentials\CredentialProvider;
 use Aws\Credentials\Credentials;
 use Aws\Signature\SignatureV4;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Ring\Client\MockHandler;
 use Nekman\AwsRingHttpSigner\AwsRingHttpSigner;
-use PHPUnit\Framework\TestCase;
 use Nekman\AwsRingHttpSigner\AwsRingHttpSignerFactory;
-use GuzzleHttp\Psr7\Request;
+use PHPUnit\Framework\TestCase;
 
 class AwsRingHttpSignerTest extends TestCase
 {
