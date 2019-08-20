@@ -49,17 +49,18 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
     
     public function __invoke(callable $handler): callable
     {
-        return function (array $request) use ($handler) : FutureArrayInterface {
+        return function (array $ringRequest) use ($handler) : FutureArrayInterface {
             // Fetch the AWS credentials
             $credentials = call_user_func($this->credentialsProvider)->wait();
             
             // Sign the request using the AWS credentials
-            $psrRequest = $this->convertRingToPsr($request);
+            $psrRequest = $this->convertRingToPsr($ringRequest);
             $signedPsrRequest = $this->signature->signRequest($psrRequest, $credentials);
             
-            // Convert the request back to Ring HTTP and continue
-            $request = $this->convertPsrToRing($signedPsrRequest);
-            return $handler($request);
+            // Convert the request back to Ring HTTP and continue. Merge the new request with the old
+            // so we do not loose any keys
+            $signedRingRequest = array_merge($ringRequest, $this->convertPsrToRing($signedPsrRequest));
+            return $handler($signedRingRequest);
         };
     }
     
@@ -97,14 +98,11 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
             $request = $request->withHeader("Host", $request->getUri()->getHost());
         }
         
-        $body = $request->getBody();
-        $contentLength = $body->getSize();
-        
         return [
             "http_method" => $request->getMethod(),
             "uri" => "/{$request->getUri()->getPath()}",
             "headers" => $request->getHeaders(),
-            "body" => ! empty($contentLength) ? $body : null,
+            "body" => $request->getBody(),
             "scheme" => $request->getUri()->getScheme()
         ];
     }
