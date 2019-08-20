@@ -60,9 +60,7 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
             
             // Convert the request back to Ring HTTP and continue
             $request = $this->convertPsrToRing($signedPsrRequest);
-            $promise = $handler($request);
-            
-            return new FutureArray($promise);
+            return $handler($request);
         };
     }
     
