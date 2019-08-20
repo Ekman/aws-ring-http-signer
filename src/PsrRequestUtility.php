@@ -55,8 +55,10 @@ class PsrRequestUtility
         }
         
         $scheme = $ringRequest["scheme"] ?? "http";
+        $queryString = $ringRequest["query_string"] ?? null;
+        $hasQueryString = ! empty($queryString) ? "?" : null;
         
-        return "{$scheme}://{$host}{$ringRequest['uri']}";
+        return "{$scheme}://{$host}{$ringRequest['uri']}{$hasQueryString}{$queryString}";
     }
     
     /**

@@ -34,7 +34,7 @@ use Nekman\AwsRingHttpSigner\Contract\AwsRingHttpSignerInterface;
 use Psr\Http\Message\RequestInterface;
 
 class AwsRingHttpSigner implements AwsRingHttpSignerInterface
-{
+{    
     /** @var SignatureInterface */
     private $signature;
     
@@ -81,8 +81,9 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
         return new Request(
             $request["http_method"],
             $url,
-            $request["headers"],
-            $request["body"] ?? null
+            $request["headers"] ?? [],
+            $request["body"] ?? null,
+            $request["version"] ?? "1.1"
         );
     }
     
@@ -103,7 +104,9 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
             "uri" => "/{$request->getUri()->getPath()}",
             "headers" => $request->getHeaders(),
             "body" => $request->getBody(),
-            "scheme" => $request->getUri()->getScheme()
+            "scheme" => $request->getUri()->getScheme(),
+            "query_string" => $request->getUri()->getQuery(),
+            "version" => $request->getProtocolVersion() ?? "1.1"
         ];
     }
 }

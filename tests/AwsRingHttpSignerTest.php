@@ -9,7 +9,6 @@ use GuzzleHttp\Ring\Client\MockHandler;
 use Nekman\AwsRingHttpSigner\AwsRingHttpSigner;
 use Nekman\AwsRingHttpSigner\AwsRingHttpSignerFactory;
 use PHPUnit\Framework\TestCase;
-use GuzzleHttp\Psr7\Stream;
 use Psr\Http\Message\StreamInterface;
 
 class AwsRingHttpSignerTest extends TestCase
@@ -61,6 +60,7 @@ class AwsRingHttpSignerTest extends TestCase
         $this->assertEquals($expected->getHeaders(), $psrRequest->getHeaders());
         $this->assertEquals($expected->getUri(), $psrRequest->getUri());
         $this->assertEquals($expected->getBody()->getContents(), $psrRequest->getBody()->getContents());
+        $this->assertEquals($expected->getProtocolVersion(), $psrRequest->getProtocolVersion());
     }
     
     public function provideConvertRingToPsr()
@@ -70,7 +70,8 @@ class AwsRingHttpSignerTest extends TestCase
                 [
                     "http_method" => "GET",
                     "headers" => ["Host" => ["google.com"]],
-                    "uri" => "/"
+                    "uri" => "/",
+                    "version" => 1.1
                 ],
                 new Request("GET", "http://google.com/", ["Host" => ["google.com"]])
             ],
@@ -82,6 +83,15 @@ class AwsRingHttpSignerTest extends TestCase
                     "body" => '{"hello":"world"}'
                 ],
                 new Request("PUT", "http://google.com/", ["Host" => ["google.com"]], '{"hello":"world"}')
+            ],
+            "Test with query string" => [
+                [
+                    "http_method" => "GET",
+                    "headers" => ["Host" => ["google.com"]],
+                    "uri" => "/",
+                    "query_string" => "foo=bar"
+                ],
+                new Request("GET", "http://google.com/?foo=bar", ["Host" => ["google.com"]])
             ]
         ];
     }
@@ -97,6 +107,8 @@ class AwsRingHttpSignerTest extends TestCase
         $this->assertInstanceOf(StreamInterface::class, $ringRequest["body"]);
         $this->assertEquals($expected["body"], $ringRequest["body"]->getContents());
         $this->assertEquals($expected["scheme"], $ringRequest["scheme"]);
+        $this->assertEquals($expected["query_string"] ?? null, $ringRequest["query_string"]);
+        $this->assertEquals($expected["version"] ?? "1.1", $ringRequest["version"] ?? "1.1");
     }
     
     public function provideConvertPsrToRing()
@@ -108,8 +120,9 @@ class AwsRingHttpSignerTest extends TestCase
                     "http_method" => "GET",
                     "headers" => ["Host" => ["google.com"]],
                     "uri" => "/",
-                    "body" => new Stream(fopen("php://temp", "w")),
-                    "scheme" => "https"
+                    "body" => null,
+                    "scheme" => "https",
+                    "version" => "1.1"
                 ]
             ],
             "Test with body" => [
@@ -120,6 +133,17 @@ class AwsRingHttpSignerTest extends TestCase
                     "uri" => "/",
                     "body" => '{"hello":"world"}',
                     "scheme" => "https"
+                ]
+            ],
+            "Test with query string" => [
+                new Request("GET", "https://google.com?foo=bar"),
+                [
+                    "http_method" => "GET",
+                    "headers" => ["Host" => ["google.com"]],
+                    "uri" => "/",
+                    "body" => null,
+                    "scheme" => "https",
+                    "query_string" => "foo=bar"
                 ]
             ]
         ];
