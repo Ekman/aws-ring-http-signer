@@ -41,6 +41,7 @@ class AwsRingHttpSignerFactoryTest extends TestCase
     {
         $credentials = new Credentials("key", "secret");
         $credentialProvider = CredentialProvider::fromCredentials($credentials);
+        
         $this->assertNotNull(AwsRingHttpSignerFactory::create("eu-central-1", $credentialProvider));
     }
 }
