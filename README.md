@@ -39,7 +39,7 @@ $response = $awsSignedHandler([
 ]);
 ```
 
-## AWS Credentials Provider
+### AWS Credentials Provider
 
 By default the library will use the default credentials provider provided by AWS. Lets say you want to provide static credentials from environment variables instead:
 
