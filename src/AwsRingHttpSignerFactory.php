@@ -44,13 +44,16 @@ class AwsRingHttpSignerFactory
     /**
      * Create a new instance of a AWS Ring HTTP signer middleware
      *
+     * @param string $awsRegion AWS region where the instance resides
+     * @param callable|null Define how to get the credentials. Defaults to AWS default provider.
      * @return AwsRingHttpSignerInterface Implementation of the AWS Ring HTTP signer middlware
+     * @see CredentialProvider::defaultProvider()
      */
-    public static function create(string $awsRegion): AwsRingHttpSignerInterface
+    public static function create(string $awsRegion, ?callable $credentialProvider = null): AwsRingHttpSignerInterface
     {
         return new AwsRingHttpSigner(
             new SignatureV4("es", $awsRegion),
-            CredentialProvider::defaultProvider()
+            $credentialProvider ?? CredentialProvider::defaultProvider()
         );
     }
 }

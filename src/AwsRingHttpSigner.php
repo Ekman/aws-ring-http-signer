@@ -104,7 +104,7 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
             // There's a bug in parse_url where an address without
             // scheme is parsed as "path" and not "host"
             if (empty($host)) {
-                $host = $request->getUri()->getPath();
+                $host = $path;
                 $path = null;
             }
             

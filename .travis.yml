@@ -12,7 +12,7 @@ matrix:
   - php: 7.4snapshot
   - php: nightly
 
-install: composer install --no-interaction --classmap-authoritative --no-suggest --ignore-platform-reqs
+install: composer update --no-interaction --classmap-authoritative --no-suggest --ignore-platform-reqs --prefer-lowest
 
 script: vendor/bin/phpunit --configuration phpunit.xml
 

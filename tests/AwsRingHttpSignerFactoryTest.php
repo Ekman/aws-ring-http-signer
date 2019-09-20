@@ -27,11 +27,21 @@ namespace Nekman\AwsRingHttpSigner\Test;
 
 use Nekman\AwsRingHttpSigner\AwsRingHttpSignerFactory;
 use PHPUnit\Framework\TestCase;
+use Aws\Credentials\CredentialProvider;
+use Aws\Credentials\Credentials;
 
 class AwsRingHttpSignerFactoryTest extends TestCase
 {
     public function testCreate()
     {
         $this->assertNotNull(AwsRingHttpSignerFactory::create("eu-central-1"));
+    }
+
+    public function testCreate_credential_provider()
+    {
+        $credentials = new Credentials("key", "secret");
+        $credentialProvider = CredentialProvider::fromCredentials($credentials);
+        
+        $this->assertNotNull(AwsRingHttpSignerFactory::create("eu-central-1", $credentialProvider));
     }
 }

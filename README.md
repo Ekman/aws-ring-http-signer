@@ -39,6 +39,23 @@ $response = $awsSignedHandler([
 ]);
 ```
 
+## AWS Credentials Provider
+
+By default the library will use the default credentials provider provided by AWS. Lets say you want to provide static credentials from environment variables instead:
+
+```php
+use Nekman\AwsRingHttpSigner\AwsRingHttpSignerFactory;
+use Aws\Credentials\CredentialProvider;
+use Aws\Credentials\Credentials;
+
+$credentials = new Credentials(getenv("AWS_KEY"), getenv("AWS_SECRET"));
+$credentialProvider = CredentialProvider::fromCredentials($credentials);
+
+$awsRingHttpSigner = AwsRingHttpSignerFactory::create($awsRegion, $credentialProvider);
+```
+
+There are many other ways to load credentials. You can [read more about loading credentials in the AWS documentation](https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials_provider.html).
+
 ### Usage with Elasticsearch
 
 Install Elasticsearch separetely:
@@ -60,7 +77,3 @@ $client = ClientBuilder::create()
 ```
 
 All requests using Elasticsearch will now be signed with AWS credentials.
-
-## AWS Credentials Provider
-
-By default this library will use the `\Aws\Credentials\CredentialProvider::defaultProvider()` to sign requests. If you want to use something else, you must skip instantiating the middleware using the factory and instantiate it yourself, calling `new AwsRingHttpSigner($signature, $credentialsProvider);`. You can read more about [loading credentials in the AWS documentation](https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials_provider.html).
