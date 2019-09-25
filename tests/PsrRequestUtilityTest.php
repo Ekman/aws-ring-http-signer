@@ -81,6 +81,8 @@ class PsrRequestUtilityTest extends TestCase
     public function testGetBody($request, $expected)
     {
         $body = PsrRequestUtility::getBody($request);
+        
+        $this->assertTrue($body === null || is_string($body) || is_resource($body));
 
         if (is_resource($body)) {
             $body = stream_get_contents($body);
