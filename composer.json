@@ -29,10 +29,11 @@
         "aws/aws-sdk-php": "^3.0",
         "psr/http-message": "^1.0",
         "guzzlehttp/ringphp": "^1.0",
-        "guzzlehttp/psr7": "^1.0"
+        "guzzlehttp/psr7": "^1.0",
+        "guzzle/stream": "^3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.0",
+        "phpunit/phpunit": "^7.5",
         "php-coveralls/php-coveralls": "^2.1",
         "friendsofphp/php-cs-fixer": "^2.15"
     },

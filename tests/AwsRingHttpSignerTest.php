@@ -105,7 +105,7 @@ class AwsRingHttpSignerTest extends TestCase
         $this->assertEquals($expected["headers"], $ringRequest["headers"]);
         $this->assertEquals($expected["uri"], $ringRequest["uri"]);
         $this->assertNotInstanceOf(StreamInterface::class, $ringRequest["body"]);
-        $this->assertEquals($expected["body"], $ringRequest["body"]);
+        $this->assertEquals($expected["body"], stream_get_contents($ringRequest["body"]));
         $this->assertEquals($expected["scheme"], $ringRequest["scheme"]);
         $this->assertEquals($expected["query_string"] ?? null, $ringRequest["query_string"]);
         $this->assertEquals($expected["version"] ?? "1.1", $ringRequest["version"] ?? "1.1");
