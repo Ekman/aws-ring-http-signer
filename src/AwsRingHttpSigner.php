@@ -32,6 +32,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Ring\Future\FutureArrayInterface;
 use Nekman\AwsRingHttpSigner\Contract\AwsRingHttpSignerInterface;
 use Psr\Http\Message\RequestInterface;
+use GuzzleHttp\Ring\Core;
 
 class AwsRingHttpSigner implements AwsRingHttpSignerInterface
 {    
@@ -72,17 +73,11 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
      */
     public function convertRingToPsr(array $request): RequestInterface
     {
-        $url = PsrRequestUtility::getUrl($request);
-        
-        if (empty($url)) {
-            throw new \InvalidArgumentException("Could not find a URL in the request");
-        }
-        
         return new Request(
             $request["http_method"],
-            $url,
+            Core::url($request),
             $request["headers"] ?? [],
-            $request["body"] ?? null,
+            Core::body($request),
             $request["version"] ?? "1.1"
         );
     }
@@ -111,8 +106,8 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
             $request = $request->withHeader("Host", $host);
         }
         
-        // The Elasticsearch PHP client seems to not like passing a StreamInterface as body,
-        // even though it adheres to the Ring HTTP specification.
+        // The Elasticsearch PHP client seems to not like passing a StreamInterface or resource as body,
+        // even though it adheres to the Ring HTTP specification. It hangs the request!
         $body = $request->getBody()->getContents();
         $scheme = $request->getUri()->getScheme();
         
