@@ -26,7 +26,7 @@ class AwsRingHttpSignerTest extends TestCase
         
         $request = [
             "http_method" => "GET",
-            "headers" => ["Host" => "example.com"],
+            "headers" => ["Host" => ["example.com"]],
             "scheme" => "https",
             "uri" => "/",
             "future" => true
