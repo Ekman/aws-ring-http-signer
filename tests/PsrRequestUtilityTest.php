@@ -3,7 +3,6 @@ namespace Nekman\AwsRingHttpSigner\Test;
 
 use Nekman\AwsRingHttpSigner\PsrRequestUtility;
 use PHPUnit\Framework\TestCase;
-use GuzzleHttp\Stream\Stream;
 
 class PsrRequestUtilityTest extends TestCase
 {
@@ -73,59 +72,6 @@ class PsrRequestUtilityTest extends TestCase
                     "headers" => ["content-type" => ["application/json"]]
                 ],
                 null
-            ]
-        ];
-    }
-
-    /** @dataProvider provideGetBody */
-    public function testGetBody($request, $expected)
-    {
-        $body = PsrRequestUtility::getBody($request);
-        
-        $this->assertTrue($body === null || is_string($body) || is_resource($body));
-
-        if (is_resource($body)) {
-            $body = stream_get_contents($body);
-        }
-
-        $this->assertEquals($expected, $body);
-    }
-
-    public function provideGetBody()
-    {
-        return [
-            "Test null" => [
-                [],
-                null
-            ],
-            "Test \GuzzleHttp\Stream\StreamInterface" => [
-                [
-                    "body" => Stream::factory("Hello, World")
-                ],
-                "Hello, World"
-            ],
-            "Test resource" => [
-                [
-                    "body" => fopen('data://text/plain,Hello World','r')
-                ],
-                "Hello World"
-            ],
-            "Test __toString" => [
-                [
-                    "body" => new class {
-                        public function __toString()
-                        {
-                            return "Hello, World";
-                        }
-                    }
-                ],
-                "Hello, World"
-            ],
-            "Test \Iterator" => [
-                [
-                    "body" => new \ArrayIterator([ "Hello", ", ", "World" ])
-                ],
-                "Hello, World"
             ]
         ];
     }

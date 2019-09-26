@@ -27,9 +27,6 @@ declare(strict_types=1);
 
 namespace Nekman\AwsRingHttpSigner;
 
-use GuzzleHttp\Stream\StreamInterface;
-use Psr\Http\Message\RequestInterface;
-
 /**
  * @internal
  */
@@ -83,52 +80,5 @@ class PsrRequestUtility
         }
         
         return $hosts[0];
-    }
-
-    /**
-     * Get the body from a Ring request as either a resource or a string
-     * 
-     * @param array $ringRequest The Ring request to get the body of
-     * @return string|resource|null
-     */
-    public static function getBody(array $ringRequest)
-    {
-        // Inspired by: https://github.com/guzzle/RingPHP/blob/master/src/Core.php#L226
-        // But don't want to read resources into memory
-        $body = $ringRequest["body"] ?? null;
-
-        if ($body === null) {
-            return $body;
-        }
-
-        if ($body instanceof StreamInterface) {
-            $bodyContent = $body->detach();
-
-            // According to Guzzles StreamInterface contract then null will be returned
-            // if the stream did not have any resource. This is different from the PSR
-            // StreamInterface in that a stream should have a resource.
-            if ($body === null) {
-                // Attempt to get the body by converting it to string instead
-                $bodyContent = (string) $body;
-            }
-
-            return $bodyContent;
-        }
-        
-        $type = gettype($body);
-
-        if (in_array($type, ["resource", "string"])) {
-            return $body;
-        }
-
-        if ($body instanceof \Iterator) {
-            return implode('', iterator_to_array($body));
-        } 
-        
-        if (method_exists($body, '__toString')) {
-            return (string) $body;
-        }
-
-        throw new \InvalidArgumentException("Does not understand body type: {$type}");
     }
 }
