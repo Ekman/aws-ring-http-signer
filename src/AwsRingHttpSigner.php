@@ -82,7 +82,7 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
             $request["http_method"],
             $url,
             $request["headers"] ?? [],
-            PsrRequestUtility::getBody($request),
+            $request["body"] ?? null,
             $request["version"] ?? "1.1"
         );
     }
@@ -110,14 +110,17 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
             
             $request = $request->withHeader("Host", $host);
         }
-
+        
+        // The Elasticsearch PHP client seems to not like passing a StreamInterface as body,
+        // even though it adheres to the Ring HTTP specification.
+        $body = $request->getBody()->getContents();
         $scheme = $request->getUri()->getScheme();
         
         return [
             "http_method" => $request->getMethod(),
             "uri" => "/{$path}",
             "headers" => $request->getHeaders(),
-            "body" => $request->getBody()->detach(),
+            "body" => empty($body) ? null : $body,
             "scheme" => ! empty($scheme) ? $scheme : "http",
             "query_string" => $request->getUri()->getQuery(),
             "version" => $request->getProtocolVersion() ?? "1.1"
