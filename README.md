@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/Ekman/aws-ring-http-signer.svg?branch=master)](https://travis-ci.org/Ekman/aws-ring-http-signer)
 [![Coverage Status](https://coveralls.io/repos/github/Ekman/aws-ring-http-signer/badge.svg)](https://coveralls.io/github/Ekman/aws-ring-http-signer)
 
-**Note! [RingPHP](https://github.com/guzzle/RingPHP) has been discontinued this package will supported for now, but eventually it will follow the same fate.**
+**[RingPHP](https://github.com/guzzle/RingPHP) has been discontinued but this package will be supported for now. Eventually, we will discontinue this package as well.**
 
 In order for AWS to know who/what is making the request it needs to be signed. Using this package, you can sign [RingPHP](https://ringphp.readthedocs.io/en/latest/) requests with AWS credentials.
 
@@ -24,24 +24,14 @@ use GuzzleHttp\Ring\Client\CurlHandler;
 use Aws\Signature\SignatureV4;
 use Nekman\AwsRingHttpSigner\AwsRingHttpSignerFactory;
 
-// Create an instance of this library
 $signature = new SignatureV4($awsService, $awsRegion); // How do I create this? Please consult the AWS documentation for the service you are using.
 $awsRingHttpSigner = AwsRingHttpSignerFactory::create($signature);
 
-// Wrap your Ring HTTP handler
 $defaultHandler = new CurlHandler(); // Or use whatever handler you already have available.
-$awsSignedHandler = $awsRingHttpSigner($defaultHandler);
+$handler = $awsRingHttpSigner($defaultHandler);
 
-// And you're done!
-//
-// Below is just using the handler to send a test request
-$response = $awsSignedHandler([
-    "http_method" => "GET",
-    "headers" => ["Host" => ["example.com"]]
-]);
+// And you're done! Use the $handler as you normally would
 ```
-
-And you're done! If you want to use the package with your Elasticsearch instance hosted on AWS, then keep reading.
 
 ## Usage with Elasticsearch
 
@@ -58,7 +48,6 @@ use Elasticsearch\ClientBuilder;
 use Nekman\AwsRingHttpSigner\AwsRingHttpSignerFactory;
 
 $awsRingHttpSigner = AwsRingHttpSignerFactory::create($awsRegion);
-
 $handler = $awsRingHttpSigner(ClientBuilder::defaultHandler()); 
 
 $client = ClientBuilder::create()
@@ -71,7 +60,11 @@ $client = ClientBuilder::create()
 
 ## AWS Credentials Provider and signatures
 
-By default the library will use the default credentials provider provided by AWS. Lets say you want to provide static credentials from environment variables instead:
+By default the library will use the default credentials provider provided by AWS. There are many other ways to load credentials which you can [read about in the AWS documentation](https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials_provider.html). Consult the AWS documentation on how to create a `SignatureInterface`.
+
+### Example
+
+Lets say you want to provide static credentials from environment variables:
 
 ```php
 use Nekman\AwsRingHttpSigner\AwsRingHttpSignerFactory;
@@ -84,4 +77,4 @@ $credentialProvider = CredentialProvider::fromCredentials($credentials);
 $awsRingHttpSigner = AwsRingHttpSignerFactory::create($awsRegion, $credentialProvider);
 ```
 
-There are many other ways to load credentials. You can [read more about loading credentials in the AWS documentation](https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials_provider.html). Also, please consult the AWS documentation on how to create signatures.
+Consult the AWS documentation for more information.
