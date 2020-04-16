@@ -52,9 +52,18 @@ class AwsRingHttpSignerFactory
      */
     public static function create($awsRegionOrSignature, ?callable $credentialProvider = null): AwsRingHttpSignerInterface
     {
-        $signature = $awsRegionOrSignature instanceof SignatureInterface
-            ? $awsRegionOrSignature
-            : new SignatureV4("es", $awsRegionOrSignature);
+        $signature = null;
+
+        if ($awsRegionOrSignature instanceof SignatureInterface) {
+            $signature = $awsRegionOrSignature;
+        } elseif (is_string($awsRegionOrSignature)) {
+            // Assume usage of Elasticsearch if only region is passed
+            $signature = new SignatureV4("es", $awsRegionOrSignature);
+        } else {
+            throw new \InvalidArgumentException(
+                sprintf("Expects \$awsRegionOrSignature to be an instance of \"%s\" or a string", SignatureInterface::class)
+            );
+        }
 
         return new AwsRingHttpSigner(
             $signature,

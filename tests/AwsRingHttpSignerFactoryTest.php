@@ -55,4 +55,14 @@ class AwsRingHttpSignerFactoryTest extends TestCase
 
         $this->assertNotNull(AwsRingHttpSignerFactory::create($signature, $credentialProvider));
     }
+
+    public function testCreate_invalid_signature()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $credentials = new Credentials("key", "secret");
+        $credentialProvider = CredentialProvider::fromCredentials($credentials);
+
+        AwsRingHttpSignerFactory::create(123, $credentialProvider);
+    }
 }
