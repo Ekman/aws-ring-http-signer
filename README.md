@@ -3,9 +3,11 @@
 [![Build Status](https://travis-ci.org/Ekman/aws-ring-http-signer.svg?branch=master)](https://travis-ci.org/Ekman/aws-ring-http-signer)
 [![Coverage Status](https://coveralls.io/repos/github/Ekman/aws-ring-http-signer/badge.svg)](https://coveralls.io/github/Ekman/aws-ring-http-signer)
 
-In order for AWS to know who/what is making the request it needs to be signed. Using this package, you can sign Ring HTTP requests with AWS credentials.
+**Note! [RingPHP](https://github.com/guzzle/RingPHP) has been discontinued this package will supported for now, but eventually it will follow the same fate.**
 
-Do you want to use this with your Elasticsearch instance hosted on AWS? See the [Usage with Elasticsearch](#usage-with-elasticsearch) section below.
+In order for AWS to know who/what is making the request it needs to be signed. Using this package, you can sign [RingPHP](https://ringphp.readthedocs.io/en/latest/) requests with AWS credentials.
+
+**Do you want to use this with your Elasticsearch instance hosted on AWS? See the [Usage with Elasticsearch](#usage-with-elasticsearch) section below.**
 
 ## Usage
 

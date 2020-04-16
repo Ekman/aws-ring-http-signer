@@ -29,13 +29,13 @@ namespace Nekman\AwsRingHttpSigner;
 
 use Aws\Signature\SignatureInterface;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Ring\Core;
 use GuzzleHttp\Ring\Future\FutureArrayInterface;
 use Nekman\AwsRingHttpSigner\Contract\AwsRingHttpSignerInterface;
 use Psr\Http\Message\RequestInterface;
-use GuzzleHttp\Ring\Core;
 
 class AwsRingHttpSigner implements AwsRingHttpSignerInterface
-{    
+{
     /** @var SignatureInterface */
     private $signature;
     
