@@ -28,6 +28,7 @@ declare(strict_types=1);
 namespace Nekman\AwsRingHttpSigner;
 
 use Aws\Credentials\CredentialProvider;
+use Aws\Signature\SignatureInterface;
 use Aws\Signature\SignatureV4;
 use Nekman\AwsRingHttpSigner\Contract\AwsRingHttpSignerInterface;
 
@@ -44,15 +45,19 @@ class AwsRingHttpSignerFactory
     /**
      * Create a new instance of a AWS Ring HTTP signer middleware
      *
-     * @param string $awsRegion AWS region where the instance resides
+     * @param string|SignatureInterface $awsRegionOrSignature AWS region where the instance resides or your own signature.
      * @param callable|null Define how to get the credentials. Defaults to AWS default provider.
-     * @return AwsRingHttpSignerInterface Implementation of the AWS Ring HTTP signer middlware
+     * @return AwsRingHttpSignerInterface Implementation of the AWS Ring HTTP signer middleware
      * @see CredentialProvider::defaultProvider()
      */
-    public static function create(string $awsRegion, ?callable $credentialProvider = null): AwsRingHttpSignerInterface
+    public static function create($awsRegionOrSignature, ?callable $credentialProvider = null): AwsRingHttpSignerInterface
     {
+        $signature = $awsRegionOrSignature instanceof SignatureInterface
+            ? $awsRegionOrSignature
+            : new SignatureV4("es", $awsRegionOrSignature);
+
         return new AwsRingHttpSigner(
-            new SignatureV4("es", $awsRegion),
+            $signature,
             $credentialProvider ?? CredentialProvider::defaultProvider()
         );
     }

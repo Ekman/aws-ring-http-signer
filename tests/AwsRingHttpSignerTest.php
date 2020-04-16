@@ -37,7 +37,7 @@ class AwsRingHttpSignerTest extends TestCase
         $assertHandler = function ($handler) use ($expectedAwsSignatureRegexp) {
             return function (array $request) use ($handler, $expectedAwsSignatureRegexp) {
                 // Assert that the request has been signed properly
-                $this->assertRegExp($expectedAwsSignatureRegexp, $request["headers"]["Authorization"][0]);
+                $this->assertMatchesRegularExpression($expectedAwsSignatureRegexp, $request["headers"]["Authorization"][0]);
                 // Assert that merging keys works
                 $this->assertTrue($request["future"]);
                 
