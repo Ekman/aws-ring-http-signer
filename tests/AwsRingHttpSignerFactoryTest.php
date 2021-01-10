@@ -34,36 +34,36 @@ use PHPUnit\Framework\TestCase;
 
 class AwsRingHttpSignerFactoryTest extends TestCase
 {
-	public function testCreate()
-	{
-		$this->assertNotNull(AwsRingHttpSignerFactory::create("eu-central-1"));
-	}
+    public function testCreate()
+    {
+        $this->assertNotNull(AwsRingHttpSignerFactory::create("eu-central-1"));
+    }
 
-	public function testCreate_credential_provider()
-	{
-		$credentials = new Credentials("key", "secret");
-		$credentialProvider = CredentialProvider::fromCredentials($credentials);
+    public function testCreate_credential_provider()
+    {
+        $credentials = new Credentials("key", "secret");
+        $credentialProvider = CredentialProvider::fromCredentials($credentials);
 
-		$this->assertNotNull(AwsRingHttpSignerFactory::create("eu-central-1", $credentialProvider));
-	}
+        $this->assertNotNull(AwsRingHttpSignerFactory::create("eu-central-1", $credentialProvider));
+    }
 
-	public function testCreate_signature()
-	{
-		$credentials = new Credentials("key", "secret");
-		$credentialProvider = CredentialProvider::fromCredentials($credentials);
+    public function testCreate_signature()
+    {
+        $credentials = new Credentials("key", "secret");
+        $credentialProvider = CredentialProvider::fromCredentials($credentials);
 
-		$signature = new SignatureV4("es", "eu-central-1");
+        $signature = new SignatureV4("es", "eu-central-1");
 
-		$this->assertNotNull(AwsRingHttpSignerFactory::create($signature, $credentialProvider));
-	}
+        $this->assertNotNull(AwsRingHttpSignerFactory::create($signature, $credentialProvider));
+    }
 
-	public function testCreate_invalid_signature()
-	{
-		$this->expectException(InvalidArgumentException::class);
+    public function testCreate_invalid_signature()
+    {
+        $this->expectException(InvalidArgumentException::class);
 
-		$credentials = new Credentials("key", "secret");
-		$credentialProvider = CredentialProvider::fromCredentials($credentials);
+        $credentials = new Credentials("key", "secret");
+        $credentialProvider = CredentialProvider::fromCredentials($credentials);
 
-		AwsRingHttpSignerFactory::create(123, $credentialProvider);
-	}
+        AwsRingHttpSignerFactory::create(123, $credentialProvider);
+    }
 }
