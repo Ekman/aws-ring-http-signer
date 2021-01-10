@@ -20,7 +20,6 @@ workflows:
   master:
     jobs:
       - phpunit/test: &unit-tests
-          name: unit-tests
           matrix:
             parameters:
               executor:
@@ -34,7 +33,6 @@ workflows:
   branch:
     jobs:
       - php-cs-fixer/fix:
-          name: coding-standards
           executor: php74
           rules: "@PSR2"
           pre-steps:
@@ -56,5 +54,4 @@ workflows:
             - php-coveralls/upload:
                 clover-path: coverage/clover.xml
           filters: *branch-filters
-          requires:
-            - coding-standards
+          requires: [ php-cs-fixer/fix ]

@@ -1,60 +1,60 @@
 {
-    "name": "nekman/aws-ring-http-signer",
-    "description": "Sign Ring HTTP calls using AWS credentials",
-    "type": "library",
-    "license": "MIT",
-    "minimum-stability": "stable",
-    "prefer-stable": true,
-    "keywords": [
-        "ring",
-        "http",
-        "aws",
-        "signature",
-        "elasticsearch",
-        "middleware",
-        "amazon"
-    ],
-    "authors": [
-        {
-            "name": "Niklas Ekman",
-            "email": "nikl.ekman@gmail.com"
-        }
-    ],
-    "support": {
-        "issues": "https://github.com/Ekman/aws-ring-http-signer/issues",
-        "source": "https://github.com/Ekman/aws-ring-http-signer"
-    },
-    "require": {
-        "php": "^7.4||^8.0",
-        "aws/aws-sdk-php": "^3.0",
-        "psr/http-message": "^1.0",
-        "guzzlehttp/ringphp": "^1.0",
-        "guzzlehttp/psr7": "^1.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^9.0",
-        "php-coveralls/php-coveralls": "^2.1",
-        "friendsofphp/php-cs-fixer": "^2.15"
-    },
-    "autoload": {
-        "psr-4": {
-            "Nekman\\AwsRingHttpSigner\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Nekman\\AwsRingHttpSigner\\Test\\": "tests"
-        }
-    },
-    "suggest": {
-        "elasticsearch/elasticsearch": "Sign Elasticsearch requests using AWS credentials"
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.x-dev"
-        }
-    },
-    "scripts": {
-        "test": "phpunit"
-    }
+	"name": "nekman/aws-ring-http-signer",
+	"description": "Sign Ring HTTP calls using AWS credentials",
+	"type": "library",
+	"license": "MIT",
+	"minimum-stability": "stable",
+	"prefer-stable": true,
+	"keywords": [
+		"ring",
+		"http",
+		"aws",
+		"signature",
+		"elasticsearch",
+		"middleware",
+		"amazon"
+	],
+	"authors": [
+		{
+			"name": "Niklas Ekman",
+			"email": "nikl.ekman@gmail.com"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/Ekman/aws-ring-http-signer/issues",
+		"source": "https://github.com/Ekman/aws-ring-http-signer"
+	},
+	"require": {
+		"php": "^7.4||^8.0",
+		"aws/aws-sdk-php": "^3.0",
+		"psr/http-message": "^1.0",
+		"guzzlehttp/ringphp": "^1.0",
+		"guzzlehttp/psr7": "^1.0"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^9.0",
+		"php-coveralls/php-coveralls": "^2.1",
+		"friendsofphp/php-cs-fixer": "^2.15"
+	},
+	"autoload": {
+		"psr-4": {
+			"Nekman\\AwsRingHttpSigner\\": "src"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Nekman\\AwsRingHttpSigner\\Test\\": "tests"
+		}
+	},
+	"suggest": {
+		"elasticsearch/elasticsearch": "Sign Elasticsearch requests using AWS credentials"
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "1.x-dev"
+		}
+	},
+	"scripts": {
+		"test": "phpunit"
+	}
 }

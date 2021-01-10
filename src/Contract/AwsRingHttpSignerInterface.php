@@ -33,7 +33,7 @@ namespace Nekman\AwsRingHttpSigner\Contract;
  */
 interface AwsRingHttpSignerInterface
 {
-    
+
     /**
      * Invoke the middleware and proxy calls to a given handler
      *

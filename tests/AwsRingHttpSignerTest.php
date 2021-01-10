@@ -1,4 +1,5 @@
 <?php
+
 namespace Nekman\AwsRingHttpSigner\Test;
 
 use Aws\Credentials\CredentialProvider;
@@ -9,6 +10,7 @@ use GuzzleHttp\Ring\Client\MockHandler;
 use Nekman\AwsRingHttpSigner\AwsRingHttpSigner;
 use Nekman\AwsRingHttpSigner\AwsRingHttpSignerFactory;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 
 class AwsRingHttpSignerTest extends TestCase
@@ -16,14 +18,14 @@ class AwsRingHttpSignerTest extends TestCase
     public function testInvoke()
     {
         $expectedAwsSignatureRegexp = "/AWS4-HMAC-SHA256 Credential=test1\/\d{8}\/eu-central-1\/es\/aws4_request, SignedHeaders=host;x-amz-date, Signature=.{64}/";
-        
+
         $credentials = new Credentials("test1", "test2");
         $credentialsProvider = CredentialProvider::fromCredentials($credentials);
-        
+
         $signature = new SignatureV4("es", "eu-central-1");
-        
+
         $awsRingHttpSigner = new AwsRingHttpSigner($signature, $credentialsProvider);
-        
+
         $request = [
             "http_method" => "GET",
             "headers" => ["Host" => ["example.com"]],
@@ -31,38 +33,38 @@ class AwsRingHttpSignerTest extends TestCase
             "uri" => "/",
             "future" => true
         ];
-        
+
         $handler = new MockHandler(["status" => 200]);
-        
+
         $assertHandler = function ($handler) use ($expectedAwsSignatureRegexp) {
             return function (array $request) use ($handler, $expectedAwsSignatureRegexp) {
                 // Assert that the request has been signed properly
                 $this->assertRegExp($expectedAwsSignatureRegexp, $request["headers"]["Authorization"][0]);
                 // Assert that merging keys works
                 $this->assertTrue($request["future"]);
-                
+
                 return $handler($request);
             };
         };
-        
+
         $response = $awsRingHttpSigner($assertHandler($handler))($request);
-        
+
         $this->assertEquals(200, $response["status"]);
     }
-    
+
     /** @dataProvider provideConvertRingToPsr */
     public function testConvertRingToPsr($ringRequest, $expected)
     {
-        /** @var \Psr\Http\Message\RequestInterface $psrRequest */
+        /** @var RequestInterface $psrRequest */
         $psrRequest = AwsRingHttpSignerFactory::create("eu-central-1")->convertRingToPsr($ringRequest);
-        
+
         $this->assertEquals($expected->getMethod(), $psrRequest->getMethod());
         $this->assertEquals($expected->getHeaders(), $psrRequest->getHeaders());
         $this->assertEquals($expected->getUri(), $psrRequest->getUri());
         $this->assertEquals($expected->getBody()->getContents(), $psrRequest->getBody()->getContents());
         $this->assertEquals($expected->getProtocolVersion(), $psrRequest->getProtocolVersion());
     }
-    
+
     public function provideConvertRingToPsr()
     {
         return [
@@ -95,12 +97,12 @@ class AwsRingHttpSignerTest extends TestCase
             ]
         ];
     }
-    
+
     /** @dataProvider provideConvertPsrToRing */
     public function testConvertPsrToRing($psrRequest, $expected)
     {
         $ringRequest = AwsRingHttpSignerFactory::create("eu-central-1")->convertPsrToRing($psrRequest);
-        
+
         $this->assertEquals($expected["http_method"], $ringRequest["http_method"]);
         $this->assertEquals($expected["headers"], $ringRequest["headers"]);
         $this->assertEquals($expected["uri"], $ringRequest["uri"]);
@@ -110,7 +112,7 @@ class AwsRingHttpSignerTest extends TestCase
         $this->assertEquals($expected["query_string"] ?? null, $ringRequest["query_string"]);
         $this->assertEquals($expected["version"] ?? "1.1", $ringRequest["version"] ?? "1.1");
     }
-    
+
     public function provideConvertPsrToRing()
     {
         return [

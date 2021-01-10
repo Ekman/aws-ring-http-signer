@@ -25,11 +25,12 @@
 
 namespace Nekman\AwsRingHttpSigner\Test;
 
-use Aws\Signature\SignatureV4;
-use Nekman\AwsRingHttpSigner\AwsRingHttpSignerFactory;
-use PHPUnit\Framework\TestCase;
 use Aws\Credentials\CredentialProvider;
 use Aws\Credentials\Credentials;
+use Aws\Signature\SignatureV4;
+use InvalidArgumentException;
+use Nekman\AwsRingHttpSigner\AwsRingHttpSignerFactory;
+use PHPUnit\Framework\TestCase;
 
 class AwsRingHttpSignerFactoryTest extends TestCase
 {
@@ -42,7 +43,7 @@ class AwsRingHttpSignerFactoryTest extends TestCase
     {
         $credentials = new Credentials("key", "secret");
         $credentialProvider = CredentialProvider::fromCredentials($credentials);
-        
+
         $this->assertNotNull(AwsRingHttpSignerFactory::create("eu-central-1", $credentialProvider));
     }
 
@@ -58,7 +59,7 @@ class AwsRingHttpSignerFactoryTest extends TestCase
 
     public function testCreate_invalid_signature()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $credentials = new Credentials("key", "secret");
         $credentialProvider = CredentialProvider::fromCredentials($credentials);

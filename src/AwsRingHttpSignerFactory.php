@@ -30,6 +30,7 @@ namespace Nekman\AwsRingHttpSigner;
 use Aws\Credentials\CredentialProvider;
 use Aws\Signature\SignatureInterface;
 use Aws\Signature\SignatureV4;
+use InvalidArgumentException;
 use Nekman\AwsRingHttpSigner\Contract\AwsRingHttpSignerInterface;
 
 class AwsRingHttpSignerFactory
@@ -41,7 +42,7 @@ class AwsRingHttpSignerFactory
     {
         // Only static methods.
     }
-    
+
     /**
      * Create a new instance of a AWS Ring HTTP signer middleware
      *
@@ -60,7 +61,7 @@ class AwsRingHttpSignerFactory
             // Assume usage of Elasticsearch if only region is passed
             $signature = new SignatureV4("es", $awsRegionOrSignature);
         } else {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf("Expects \$awsRegionOrSignature to be an instance of \"%s\" or a string", SignatureInterface::class)
             );
         }
