@@ -79,6 +79,10 @@ $awsRingHttpSigner = AwsRingHttpSignerFactory::create($awsRegion, $credentialPro
 
 Consult the AWS documentation for more information.
 
+## Versioning
+
+This project complies with [Semantic Versioning](https://semver.org/).
+
 ## Changelog
 
 For a complete list of changes, and how to migrate between major versions, see [releases page](https://github.com/Ekman/aws-ring-http-signer/releases).
