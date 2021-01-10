@@ -61,6 +61,7 @@ workflows:
       - phpunit/test:
           <<: *unit-tests
           flags: --coverage-clover coverage/clover.xml
+          no-cache: false # phpunit version does not support cache
           pre-steps:
             - run: |-
                 apk add --update --no-cache ${PHPIZE_DEPS} git
