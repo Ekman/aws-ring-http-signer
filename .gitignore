@@ -2,6 +2,9 @@ index.php
 nbproject/
 .idea/
 .php_cs.cache
+.phpunit.result.cache
+coverage
+test-results
 
 # Eclipse
 .buildpath
