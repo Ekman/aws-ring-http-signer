@@ -42,7 +42,7 @@ class AwsRingHttpSigner implements AwsRingHttpSignerInterface
 
     public function __construct(SignatureInterface $signature, callable $credentialsProvider)
     {
-        $this->signature = $signature;
+        $this->signature = $signature ;
         $this->credentialsProvider = $credentialsProvider;
     }
 
