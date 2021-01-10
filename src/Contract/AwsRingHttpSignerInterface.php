@@ -33,12 +33,12 @@ namespace Nekman\AwsRingHttpSigner\Contract;
  */
 interface AwsRingHttpSignerInterface
 {
-    
-    /**
-     * Invoke the middleware and proxy calls to a given handler
-     *
-     * @param callable $handler The handler to proxy calls to
-     * @return callable A new handler where requests will be signed with AWS credentials
-     */
-    public function __invoke(callable $handler): callable;
+
+	/**
+	 * Invoke the middleware and proxy calls to a given handler
+	 *
+	 * @param callable $handler The handler to proxy calls to
+	 * @return callable A new handler where requests will be signed with AWS credentials
+	 */
+	public function __invoke(callable $handler): callable;
 }

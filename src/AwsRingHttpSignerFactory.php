@@ -30,44 +30,45 @@ namespace Nekman\AwsRingHttpSigner;
 use Aws\Credentials\CredentialProvider;
 use Aws\Signature\SignatureInterface;
 use Aws\Signature\SignatureV4;
+use InvalidArgumentException;
 use Nekman\AwsRingHttpSigner\Contract\AwsRingHttpSignerInterface;
 
 class AwsRingHttpSignerFactory
 {
-    /**
-     * @codeCoverageIgnore
-     */
-    private function __construct()
-    {
-        // Only static methods.
-    }
-    
-    /**
-     * Create a new instance of a AWS Ring HTTP signer middleware
-     *
-     * @param string|SignatureInterface $awsRegionOrSignature AWS region where the instance resides or your own signature.
-     * @param callable|null Define how to get the credentials. Defaults to AWS default provider.
-     * @return AwsRingHttpSignerInterface Implementation of the AWS Ring HTTP signer middleware
-     * @see CredentialProvider::defaultProvider()
-     */
-    public static function create($awsRegionOrSignature, ?callable $credentialProvider = null): AwsRingHttpSignerInterface
-    {
-        $signature = null;
+	/**
+	 * @codeCoverageIgnore
+	 */
+	private function __construct()
+	{
+		// Only static methods.
+	}
 
-        if ($awsRegionOrSignature instanceof SignatureInterface) {
-            $signature = $awsRegionOrSignature;
-        } elseif (is_string($awsRegionOrSignature)) {
-            // Assume usage of Elasticsearch if only region is passed
-            $signature = new SignatureV4("es", $awsRegionOrSignature);
-        } else {
-            throw new \InvalidArgumentException(
-                sprintf("Expects \$awsRegionOrSignature to be an instance of \"%s\" or a string", SignatureInterface::class)
-            );
-        }
+	/**
+	 * Create a new instance of a AWS Ring HTTP signer middleware
+	 *
+	 * @param string|SignatureInterface $awsRegionOrSignature AWS region where the instance resides or your own signature.
+	 * @param callable|null Define how to get the credentials. Defaults to AWS default provider.
+	 * @return AwsRingHttpSignerInterface Implementation of the AWS Ring HTTP signer middleware
+	 * @see CredentialProvider::defaultProvider()
+	 */
+	public static function create($awsRegionOrSignature, ?callable $credentialProvider = null): AwsRingHttpSignerInterface
+	{
+		$signature = null;
 
-        return new AwsRingHttpSigner(
-            $signature,
-            $credentialProvider ?? CredentialProvider::defaultProvider()
-        );
-    }
+		if ($awsRegionOrSignature instanceof SignatureInterface) {
+			$signature = $awsRegionOrSignature;
+		} elseif (is_string($awsRegionOrSignature)) {
+			// Assume usage of Elasticsearch if only region is passed
+			$signature = new SignatureV4("es", $awsRegionOrSignature);
+		} else {
+			throw new InvalidArgumentException(
+				sprintf("Expects \$awsRegionOrSignature to be an instance of \"%s\" or a string", SignatureInterface::class)
+			);
+		}
+
+		return new AwsRingHttpSigner(
+			$signature,
+			$credentialProvider ?? CredentialProvider::defaultProvider()
+		);
+	}
 }
