@@ -1,6 +1,6 @@
 # AWS Ring HTTP Signer
 
-[![Build Status](https://travis-ci.org/Ekman/aws-ring-http-signer.svg?branch=master)](https://travis-ci.org/Ekman/aws-ring-http-signer)
+[![Build Status](https://circleci.com/gh/Ekman/aws-ring-http-signer.svg?style=svg)](https://app.circleci.com/pipelines/github/Ekman/aws-ring-http-signer)
 [![Coverage Status](https://coveralls.io/repos/github/Ekman/aws-ring-http-signer/badge.svg)](https://coveralls.io/github/Ekman/aws-ring-http-signer)
 
 **[RingPHP](https://github.com/guzzle/RingPHP) has been discontinued but this package will be supported for now. Eventually, we will discontinue this package as well.**
@@ -78,3 +78,7 @@ $awsRingHttpSigner = AwsRingHttpSignerFactory::create($awsRegion, $credentialPro
 ```
 
 Consult the AWS documentation for more information.
+
+## Changelog
+
+For a complete list of changes, and how to migrate between major versions, see [releases page](https://github.com/Ekman/aws-ring-http-signer/releases).
