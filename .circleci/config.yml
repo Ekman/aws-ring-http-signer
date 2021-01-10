@@ -7,18 +7,6 @@ orbs:
   php-coveralls: nekman/php-coveralls@0.0.5
 
 executors:
-  php71:
-    docker:
-      - image: php:7.1-alpine
-    resource_class: small
-  php72:
-    docker:
-      - image: php:7.2-alpine
-    resource_class: small
-  php73:
-    docker:
-      - image: php:7.3-alpine
-    resource_class: small
   php74:
     docker:
       - image: php:7.4-alpine
@@ -36,11 +24,8 @@ workflows:
           matrix:
             parameters:
               executor:
-                - php71
-                - php72
-                - php73
                 - php74
-                # - php80
+                - php80
           pre-steps:
             - composer/install_bin
           filters:
