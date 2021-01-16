@@ -1,10 +1,10 @@
 version: 2.1
 
 orbs:
-  composer: stockfiller/composer@0.0.38
-  php-cs-fixer: stockfiller/php-cs-fixer@0.0.18
-  phpunit: stockfiller/phpunit@0.0.13
-  php-coveralls: nekman/php-coveralls@0.0.5
+  composer: stockfiller/composer@2
+  php-cs-fixer: stockfiller/php-cs-fixer@1
+  phpunit: stockfiller/phpunit@1
+  php-coveralls: nekman/php-coveralls@2
 
 executors:
   php74:
@@ -19,6 +19,8 @@ executors:
 jobs:
   test_coverage:
     executor: php74
+    environment:
+      CLOVER_PATH: coverage/clover.xml
     steps:
       - run:
           name: Install PCOV and git
@@ -30,14 +32,18 @@ jobs:
       - composer/install_bin
       - composer/install
       - phpunit/test:
-          flags: --coverage-clover coverage/clover.xml
+          coverage: clover
+          coverage-path: "${CLOVER_PATH}"
+          src-path: src
+          test-path: tests
       - php-coveralls/upload:
-          clover-path: coverage/clover.xml
+          clover-path: "${CLOVER_PATH}"
 
 workflows:
   master:
     jobs:
       - phpunit/test:
+          test-path: tests
           matrix:
             parameters:
               executor:
@@ -52,6 +58,7 @@ workflows:
       - php-cs-fixer/fix:
           executor: php74
           rules: "@PSR2"
+          path: .
           pre-steps:
             - run: apk add --update --no-cache git openssh-client
             - composer/install_bin
@@ -62,6 +69,7 @@ workflows:
           filters: *branch-filters
           requires: [ php-cs-fixer/fix ]
       - phpunit/test:
+          test-path: tests
           matrix:
             parameters:
               executor:
