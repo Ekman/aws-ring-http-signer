@@ -3,7 +3,7 @@
 [![Build Status](https://circleci.com/gh/Ekman/aws-ring-http-signer.svg?style=svg)](https://app.circleci.com/pipelines/github/Ekman/aws-ring-http-signer)
 [![Coverage Status](https://coveralls.io/repos/github/Ekman/aws-ring-http-signer/badge.svg)](https://coveralls.io/github/Ekman/aws-ring-http-signer)
 
-**[RingPHP](https://github.com/guzzle/RingPHP) has been discontinued but this package will be supported for now. Eventually, we will discontinue this package as well.**
+**[RingPHP](https://github.com/guzzle/RingPHP) has been discontinued. This package does not make sense any more.**
 
 In order for AWS to know who/what is making the request it needs to be signed. Using this package, you can sign [RingPHP](https://ringphp.readthedocs.io/en/latest/) requests with AWS credentials.
 
